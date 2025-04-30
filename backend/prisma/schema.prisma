@@ -22,3 +22,62 @@ enum Role {
   MANAGER
   STAFF
 }
+
+model Product {
+  id          Int      @id @default(autoincrement())
+  name        String
+  description String?
+  sku         String   @unique
+  quantity    Int      @default(0)
+  price       Float
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  stockMovements StockMovement[]
+}
+
+model StockMovement {
+  id          Int      @id @default(autoincrement())
+  product     Product  @relation(fields: [productId], references: [id])
+  productId   Int
+  type        MovementType
+  quantity    Int
+  reason      String?
+  createdAt   DateTime @default(now())
+}
+
+enum MovementType {
+  IN
+  OUT 
+  ADJUST
+}
+
+model AccountPayable {
+  id          Int      @id @default(autoincrement())
+  title       String
+  supplier    String
+  dueDate     DateTime
+  amount      Float
+  status      PaymentStatus @default(PENDING)
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model AccountReceivable {
+  id          Int      @id @default(autoincrement())
+  title       String
+  customer    String
+  dueDate     DateTime
+  amount      Float
+  status      PaymentStatus @default(PENDING)
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+enum PaymentStatus {
+  PENDING
+  PAID
+  OVERDUE
+}
