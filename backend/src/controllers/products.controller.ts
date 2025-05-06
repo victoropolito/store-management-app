@@ -1,6 +1,12 @@
 import { Request, Response } from 'express';
 import { prisma } from '../../prisma/client';
 
+function generateSKU(name: string): string {
+  const prefix = name.slice(0, 3).toUpperCase();
+  const suffix = Math.floor(Math.random() * 10000).toString().padStart(4, '0');
+  return `${prefix}-${suffix}`;
+}
+
 export async function getAll(req: Request, res: Response) {
   const products = await prisma.product.findMany();
   res.json(products);
@@ -14,10 +20,14 @@ export async function getById(req: Request, res: Response) {
 }
 
 export async function create(req: Request, res: Response) {
-  const { name, sku, price, quantity, description } = req.body;
+  const { name, price, quantity, description } = req.body;
+
+  const sku = generateSKU(name);
+
   const product = await prisma.product.create({
     data: { name, sku, price, quantity, description },
   });
+
   res.status(201).json(product);
 }
 
